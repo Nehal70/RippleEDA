@@ -1,0 +1,37 @@
+{
+  "weights": {
+    "logit_raw": 0.6687116472211225,
+    "progress": 0.1718197891258704,
+    "spread": 0.0018537135236575118,
+    "evidence_ok": 0.0346790769492006
+  },
+  "bias": 1.0327810599867466,
+  "meta": {
+    "model": "ricursiveai/ripple-65b-preview",
+    "votes": 2,
+    "n_train": 55,
+    "n_test": 26,
+    "label": "hidden-grader reward (soft)",
+    "deployed_fit": "all states",
+    "test_report": [
+      {
+        "set": "raw judge  / test",
+        "n": 26,
+        "auroc_solved": 0.9878787878787879,
+        "brier_soft": 0.12497908653846154,
+        "brier_solved": 0.1310096153846154,
+        "ece_soft": 0.2196038461538462,
+        "pairwise_within_task": 0.8421052631578947
+      },
+      {
+        "set": "calibrated / test",
+        "n": 26,
+        "auroc_solved": 0.9848484848484849,
+        "brier_soft": 0.0831250998263448,
+        "brier_solved": 0.3051791167199224,
+        "ece_soft": 0.06635739447878918,
+        "pairwise_within_task": 0.8421052631578947
+      }
+    ]
+  }
+}
