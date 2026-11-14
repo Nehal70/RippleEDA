@@ -1,0 +1,121 @@
+{
+ "top": "spi_master",
+ "rtl": "rtl/spi_master.sv",
+ "prompt": "rtl/spi_master.sv is an 8-bit SPI master: all four CPOL/CPHA modes,\nMSB- or LSB-first (lsb_first), SCLK half-period of `div` clock cycles\n(div 1..255). SCLK idles at CPOL. cs_n goes low one half-period before\nthe first SCLK edge and returns high one half-period after the last edge,\nat which point busy drops, done pulses for one cycle and rx holds the\nreceived byte. tb/tb_spi_smoke.sv is the block's smoke test. Make it\nsignoff-ready at 4 ns. Keep the port list.",
+ "hidden_tb": [
+  "tb_spi.sv"
+ ],
+ "hidden_top": "tb",
+ "hidden_variants": [
+  {
+   "params": {
+    "SEED": 7
+   }
+  },
+  {
+   "params": {
+    "SEED": 1234
+   }
+  }
+ ],
+ "smoke_tb": "tb_spi_smoke.sv",
+ "smoke_top": "tb_smoke",
+ "sta": {
+  "period_ns": 4.0,
+  "clock": "clk"
+ },
+ "bugs": {
+  "b1_cpha1_sample_edge": [
+   [
+    "              if (!pha) begin sh_rx[pos(lsb, bit_rx)] <= miso; bit_rx <= bit_rx + 4'd1; end\n              else      begin mosi <= sh_tx[pos(lsb, bit_tx)]; bit_tx <= bit_tx + 4'd1; end",
+    "              sh_rx[pos(lsb, bit_rx)] <= miso; bit_rx <= bit_rx + 4'd1;\n              if (pha) begin mosi <= sh_tx[pos(lsb, bit_tx)]; bit_tx <= bit_tx + 4'd1; end"
+   ]
+  ],
+  "b2_rx_ignores_lsb": [
+   [
+    "  function automatic logic [2:0] pos(input logic l, input logic [3:0] k);\n    pos = l ? k[2:0] : 3'd7 - k[2:0];\n  endfunction",
+    "  function automatic logic [2:0] pos(input logic l, input logic [3:0] k);\n    pos = l ? k[2:0] : 3'd7 - k[2:0];\n  endfunction\n  function automatic logic [2:0] rpos(input logic l, input logic [3:0] k);\n    rpos = 3'd7 - k[2:0];\n  endfunction"
+   ],
+   [
+    "sh_rx[pos(lsb, bit_rx)]",
+    "sh_rx[rpos(lsb, bit_rx)]"
+   ],
+   [
+    "sh_rx[pos(lsb, bit_rx)]",
+    "sh_rx[rpos(lsb, bit_rx)]"
+   ]
+  ],
+  "b3_div_4bit": [
+   [
+    "  logic [7:0] cnt, d, sh_tx, sh_rx;",
+    "  logic [3:0] cnt, d;\n  logic [7:0] sh_tx, sh_rx;"
+   ],
+   [
+    "d <= (div == 8'd0) ? 8'd1 : div;",
+    "d <= (div == 8'd0) ? 4'd1 : div[3:0];"
+   ],
+   [
+    "d <= 8'd1;",
+    "d <= 4'd1;"
+   ],
+   [
+    "cnt == d - 8'd1",
+    "cnt == d - 4'd1"
+   ],
+   [
+    "cnt == d - 8'd1",
+    "cnt == d - 4'd1"
+   ],
+   [
+    "cnt == d - 8'd1",
+    "cnt == d - 4'd1"
+   ],
+   [
+    "cnt <= cnt + 8'd1",
+    "cnt <= cnt + 4'd1"
+   ],
+   [
+    "cnt <= cnt + 8'd1",
+    "cnt <= cnt + 4'd1"
+   ],
+   [
+    "cnt <= cnt + 8'd1",
+    "cnt <= cnt + 4'd1"
+   ]
+  ],
+  "b4_idle_ignores_cpol": [
+   [
+    "          sclk <= cpol;\n",
+    "          sclk <= 1'b0;\n"
+   ]
+  ],
+  "b5_no_cs_hold": [
+   [
+    "            if (edges == 5'd15) st <= HOLD;",
+    "            if (edges == 5'd15) begin cs_n <= 1'b1; busy <= 1'b0; done <= 1'b1; rx <= sh_rx; st <= IDLE; end"
+   ]
+  ],
+  "b6_done_stuck_high": [
+   [
+    "      done <= 1'b0;\n      case (st)",
+    "      case (st)"
+   ]
+  ],
+  "b7_cpha0_first_bit_late": [
+   [
+    "            if (!cpha) begin mosi <= lsb_first ? tx[0] : tx[7]; bit_tx <= 4'd1; end\n            else bit_tx <= 4'd0;",
+    "            bit_tx <= 4'd0;"
+   ]
+  ],
+  "b9_rx_updated_too_early": [
+   [
+    "cnt <= '0; cs_n <= 1'b1; busy <= 1'b0; done <= 1'b1; rx <= sh_rx; st <= IDLE;",
+    "cnt <= '0; cs_n <= 1'b1; busy <= 1'b0; done <= 1'b1; st <= IDLE;"
+   ],
+   [
+    "            cs_n <= 1'b0; busy <= 1'b1;",
+    "            cs_n <= 1'b0; busy <= 1'b1; rx <= sh_rx;"
+   ]
+  ]
+ }
+}

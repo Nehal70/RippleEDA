@@ -1,0 +1,68 @@
+{
+ "top": "div16",
+ "rtl": "rtl/div16.sv",
+ "prompt": "rtl/div16.sv is an unsigned 16/8 divider with a start/done handshake\n(divide-by-zero: q=FFFF, r=a[7:0]). Make it meet 2.6 ns with <= 2800 um^2 on\nsky130hd. Latency up to 20 cycles is allowed; busy is high while working;\noperands are only valid in the start cycle. Keep the port list.\ntb/tb_smoke_div.sv is the block's smoke test.",
+ "hidden_tb": [
+  "tb_div.sv"
+ ],
+ "hidden_top": "tb",
+ "hidden_variants": [
+  {}
+ ],
+ "smoke_tb": "tb_smoke_div.sv",
+ "smoke_top": "tb_smoke",
+ "sta": {
+  "period_ns": 2.6,
+  "clock": "clk"
+ },
+ "bugs": {
+  "d1_fifteen_iterations": [
+   [
+    "n <= 5'd16;",
+    "n <= 5'd15;"
+   ]
+  ],
+  "d2_strict_compare": [
+   [
+    "(sh >= {1'b0, dsr})",
+    "(sh > {1'b0, dsr})"
+   ]
+  ],
+  "d3_remainder_not_cleared": [
+   [
+    "dsr <= b; rem <= '0;",
+    "dsr <= b;"
+   ]
+  ],
+  "d4_done_stuck_high": [
+   [
+    "      done <= 1'b0;\n      if (start && !busy) begin",
+    "      if (start && !busy) begin"
+   ]
+  ],
+  "d5_restore_keeps_old_rem": [
+   [
+    "rem <= ge ? diff[7:0] : sh[7:0];",
+    "rem <= ge ? diff[7:0] : rem;"
+   ]
+  ],
+  "d6_quotient_bit_inverted": [
+   [
+    "dvd <= {dvd[14:0], ge};",
+    "dvd <= {dvd[14:0], ~ge};"
+   ]
+  ],
+  "d7_busy_never_set": [
+   [
+    "busy <= 1'b1; dvd <= a;",
+    "dvd <= a;"
+   ]
+  ],
+  "d8_divisor_not_latched": [
+   [
+    "assign diff = sh - {1'b0, dsr};",
+    "assign diff = sh - {1'b0, b};"
+   ]
+  ]
+ }
+}

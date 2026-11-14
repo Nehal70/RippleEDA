@@ -1,0 +1,71 @@
+{
+ "top": "irq_ctrl",
+ "rtl": "rtl/irq_ctrl.sv",
+ "prompt": "rtl/irq_ctrl.sv is an 8-source interrupt controller. For a source with\nedge_mode[i]=1, pending[i] latches on a rising edge of src[i] (even while\nen[i]=0) and stays set until acknowledged. For edge_mode[i]=0 (level),\npending[i] simply follows src[i] and ack has no effect. irq = |(pending & en);\nid is the lowest index i with pending[i] & en[i]. A one-cycle ack while irq=1\nclears the edge-pending bit of the current id; a new edge arriving in the\nsame cycle wins over the clear. tb/tb_irq_smoke.sv is the block's smoke test.\nMake it signoff-ready at 2.5 ns. Keep the port list.",
+ "hidden_tb": [
+  "tb_irq.sv"
+ ],
+ "hidden_top": "tb",
+ "hidden_variants": [
+  {
+   "params": {
+    "SEED": 7
+   }
+  },
+  {
+   "params": {
+    "SEED": 4242
+   }
+  }
+ ],
+ "smoke_tb": "tb_irq_smoke.sv",
+ "smoke_top": "tb_smoke",
+ "sta": {
+  "period_ns": 2.5,
+  "clock": "clk"
+ },
+ "bugs": {
+  "b1_edge_latches_level": [
+   [
+    "epend <= (epend & ~clr) | (rise & edge_mode);",
+    "epend <= (epend & ~clr) | (src & edge_mode);"
+   ]
+  ],
+  "b2_ack_clears_all": [
+   [
+    "    if (ack && irq) clr[id] = 1'b1;",
+    "    if (ack && irq) clr = 8'hFF;"
+   ]
+  ],
+  "b3_priority_reversed": [
+   [
+    "    for (int i = 7; i >= 0; i--) if (masked[i]) id = 3'(i);",
+    "    for (int i = 0; i < 8; i++) if (masked[i]) id = 3'(i);"
+   ]
+  ],
+  "b4_disabled_edge_dropped": [
+   [
+    "  assign rise    = src & ~prev;",
+    "  assign rise    = src & ~prev & en;"
+   ]
+  ],
+  "b5_clear_beats_new_edge": [
+   [
+    "      epend <= (epend & ~clr) | (rise & edge_mode);",
+    "      epend <= (epend | (rise & edge_mode)) & ~clr;"
+   ]
+  ],
+  "b6_irq_ignores_enable": [
+   [
+    "  assign irq     = |masked;",
+    "  assign irq     = |pending;"
+   ]
+  ],
+  "b8_id_from_unmasked": [
+   [
+    "if (masked[i]) id = 3'(i);",
+    "if (pending[i]) id = 3'(i);"
+   ]
+  ]
+ }
+}

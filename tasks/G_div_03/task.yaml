@@ -1,0 +1,26 @@
+id: G_div_03
+name: div_multibug_03
+category: rtl-repair
+difficulty: hard
+top: div16
+rtl: [rtl/div16.sv]
+lib: sky130hd
+prompt: |
+  rtl/div16.sv is an unsigned 16/8 divider with a start/done handshake
+  (divide-by-zero: q=FFFF, r=a[7:0]). Make it meet 2.6 ns with <= 2800 um^2 on
+  sky130hd. Latency up to 20 cycles is allowed; busy is high while working;
+  operands are only valid in the start cycle. Keep the port list.
+  tb/tb_smoke_div.sv is the block's smoke test.
+public_checks:   # run by the honest PRM (files from the original start/, agent edits ignored)
+  - {type: sim, tb: [tb/tb_smoke_div.sv], top: tb_smoke}
+checks:
+  - {type: lint, weight: 1}
+  - {type: sim, tb: ["tb/tb_div.sv"], top: tb, weight: 4, variants: [{}]}
+  - {type: synth, no_latches: true, weight: 1}
+  - {type: sta, period_ns: 2.6, clock: clk, weight: 1}
+generated_from: div
+bugs: ["d3_remainder_not_cleared", "d5_restore_keeps_old_rem", "d6_quotient_bit_inverted", "d7_busy_never_set", "d8_divisor_not_latched"]
+why_mcts: |
+  5 independent bugs drawn from a verified catalog; each is caught on its own by the public
+  smoke test, so every verified fix raises the public reward. A single trajectory must find and fix
+  all 5 without regressing; search keeps each fix as a node.

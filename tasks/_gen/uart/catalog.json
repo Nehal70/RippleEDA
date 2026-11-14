@@ -1,0 +1,80 @@
+{
+ "top": "uart_tx",
+ "rtl": "rtl/uart_tx.sv",
+ "prompt": "rtl/uart_tx.sv is an 8N1 UART transmitter (LSB first, idle high)\nparameterised by CLKS_PER_BIT (any value >= 2). tx_busy covers the whole\nframe and frames may be sent back-to-back. Make it signoff-ready at 4 ns.\nKeep the port list.\ntb/tb_smoke_uart.sv is the block's smoke test.",
+ "hidden_tb": [
+  "tb_uart.sv"
+ ],
+ "hidden_top": "tb",
+ "hidden_variants": [
+  {
+   "params": {
+    "CPB": 4
+   }
+  },
+  {
+   "params": {
+    "CPB": 16
+   }
+  },
+  {
+   "params": {
+    "CPB": 300
+   }
+  }
+ ],
+ "smoke_tb": "tb_smoke_uart.sv",
+ "smoke_top": "tb_smoke",
+ "sta": {
+  "period_ns": 4.0,
+  "clock": "clk"
+ },
+ "bugs": {
+  "u1_counter_8bit": [
+   [
+    "localparam int CW = (CLKS_PER_BIT > 1) ? $clog2(CLKS_PER_BIT) : 1;",
+    "localparam int CW = 8;"
+   ]
+  ],
+  "u2_msb_first": [
+   [
+    "tx <= sh[0]; st <= DATA;",
+    "tx <= sh[7]; st <= DATA;"
+   ],
+   [
+    "sh <= sh >> 1; tx <= sh[1];",
+    "sh <= sh << 1; tx <= sh[6];"
+   ]
+  ],
+  "u3_no_stop_bit": [
+   [
+    "begin tx <= 1'b1; st <= STOP; end",
+    "begin tx <= 1'b1; st <= IDLE; end"
+   ]
+  ],
+  "u4_busy_drops_in_stop": [
+   [
+    "assign tx_busy = (st != IDLE);",
+    "assign tx_busy = (st == START) || (st == DATA);"
+   ]
+  ],
+  "u5_start_bit_high": [
+   [
+    "sh <= tx_data; cnt <= '0; tx <= 1'b0; st <= START;",
+    "sh <= tx_data; cnt <= '0; tx <= 1'b1; st <= START;"
+   ]
+  ],
+  "u6_seven_data_bits": [
+   [
+    "if (bitn == 3'd7)",
+    "if (bitn == 3'd6)"
+   ]
+  ],
+  "u7_bit_period_plus_one": [
+   [
+    "LAST = CW'(CLKS_PER_BIT - 1);",
+    "LAST = CW'(CLKS_PER_BIT);"
+   ]
+  ]
+ }
+}

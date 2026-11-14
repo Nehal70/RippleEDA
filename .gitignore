@@ -11,3 +11,9 @@ scripts/*
 !scripts/write_cursor_mcp.sh
 !scripts/run_live.py
 !scripts/run_example_rollout.py
+results/
+results_*.log
+**/_run_*/
+!scripts/calibrate_judge.py
+!scripts/or_agent.py
+!scripts/run_live_calibrated.py

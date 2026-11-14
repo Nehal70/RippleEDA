@@ -1,0 +1,65 @@
+{
+ "top": "async_fifo",
+ "rtl": "rtl/async_fifo.sv",
+ "prompt": "rtl/async_fifo.sv is a depth-8 dual-clock FIFO with gray-coded pointers\ncrossing domains through synchronisers. It must work for any ratio between\nthe write and read clocks. Make it signoff-ready\n(3 ns write clock).\nKeep the port list.\ntb/tb_smoke_afifo.sv is the block's smoke test.",
+ "hidden_tb": [
+  "tb_afifo.sv"
+ ],
+ "hidden_top": "tb",
+ "hidden_variants": [
+  {
+   "params": {
+    "WPER": 10,
+    "RPER": 14
+   }
+  },
+  {
+   "params": {
+    "WPER": 14,
+    "RPER": 7
+   }
+  }
+ ],
+ "smoke_tb": "tb_smoke_afifo.sv",
+ "smoke_top": "tb_smoke",
+ "sta": {
+  "period_ns": 3.0,
+  "clock": "wclk"
+ },
+ "bugs": {
+  "a1_gray_encode_wrong": [
+   [
+    "assign wgray_n = (wbin_n >> 1) ^ wbin_n;",
+    "assign wgray_n = wbin_n ^ (wbin_n << 1);"
+   ],
+   [
+    "assign rgray_n = (rbin_n >> 1) ^ rbin_n;",
+    "assign rgray_n = rbin_n ^ (rbin_n << 1);"
+   ]
+  ],
+  "a3_empty_reset_low": [
+   [
+    "rempty <= 1'b1;",
+    "rempty <= 1'b0;"
+   ]
+  ],
+  "a5_rdata_next_entry": [
+   [
+    "assign rdata = mem[rbin[AW-1:0]];",
+    "assign rdata = mem[rbin_n[AW-1:0]];"
+   ]
+  ],
+  "a6_write_when_full": [
+   [
+    "always_ff @(posedge wclk) if (winc && !wfull) mem",
+    "always_ff @(posedge wclk) if (winc) mem"
+   ]
+  ],
+  "a7_read_when_empty": [
+   [
+    "assign rbin_n  = rbin + {{AW{1'b0}}, (rinc && !rempty)};",
+    "assign rbin_n  = rbin + {{AW{1'b0}}, rinc};"
+   ]
+  ]
+ }
+}

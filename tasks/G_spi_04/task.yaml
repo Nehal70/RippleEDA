@@ -1,0 +1,28 @@
+id: G_spi_04
+name: spi_multibug_04
+category: rtl-repair
+difficulty: hard
+top: spi_master
+rtl: [rtl/spi_master.sv]
+lib: sky130hd
+prompt: |
+  rtl/spi_master.sv is an 8-bit SPI master: all four CPOL/CPHA modes,
+  MSB- or LSB-first (lsb_first), SCLK half-period of `div` clock cycles
+  (div 1..255). SCLK idles at CPOL. cs_n goes low one half-period before
+  the first SCLK edge and returns high one half-period after the last edge,
+  at which point busy drops, done pulses for one cycle and rx holds the
+  received byte. tb/tb_spi_smoke.sv is the block's smoke test. Make it
+  signoff-ready at 4 ns. Keep the port list.
+public_checks:   # run by the honest PRM (files from the original start/, agent edits ignored)
+  - {type: sim, tb: [tb/tb_spi_smoke.sv], top: tb_smoke}
+checks:
+  - {type: lint, weight: 1}
+  - {type: sim, tb: ["tb/tb_spi.sv"], top: tb, weight: 4, variants: [{"params": {"SEED": 7}}, {"params": {"SEED": 1234}}]}
+  - {type: synth, no_latches: true, weight: 1}
+  - {type: sta, period_ns: 4.0, clock: clk, weight: 1}
+generated_from: spi
+bugs: ["b1_cpha1_sample_edge", "b2_rx_ignores_lsb", "b4_idle_ignores_cpol", "b5_no_cs_hold", "b6_done_stuck_high"]
+why_mcts: |
+  5 independent bugs drawn from a verified catalog; each is caught on its own by the public
+  smoke test, so every verified fix raises the public reward. A single trajectory must find and fix
+  all 5 without regressing; search keeps each fix as a node.

@@ -1,0 +1,28 @@
+id: G_alu_08
+name: alu_multibug_08
+category: rtl-repair
+difficulty: hard
+top: alu16
+rtl: [rtl/alu16.sv]
+lib: sky130hd
+prompt: |
+  rtl/alu16.sv is a 16-bit combinational ALU. op: 0 ADD, 1 SUB, 2 AND, 3 OR,
+  4 XOR, 5 SLL, 6 SRL, 7 SRA, 8 ROL, 9 ROR, 10 SLT (signed), 11 SLTU; shift and
+  rotate amount is b[3:0]. Flags: z = (y == 0), n = y[15], c = carry-out for
+  ADD and borrow for SUB (1 when a < b unsigned), v = signed overflow for
+  ADD/SUB; c and v are 0 for all other ops. tb/tb_alu_smoke.sv is the
+  block's smoke test. Make it signoff-ready with an input-to-output delay of
+  at most 5.5 ns. Keep the port list.
+public_checks:   # run by the honest PRM (files from the original start/, agent edits ignored)
+  - {type: sim, tb: [tb/tb_alu_smoke.sv], top: tb_smoke}
+checks:
+  - {type: lint, weight: 1}
+  - {type: sim, tb: ["tb/tb_alu.sv"], top: tb, weight: 4, variants: [{"params": {"SEED": 7}}, {"params": {"SEED": 99}}]}
+  - {type: synth, no_latches: true, weight: 1}
+  - {type: sta, period_ns: 5.5, clock: clk, weight: 1}
+generated_from: alu
+bugs: ["b02_sub_overflow_formula", "b03_sra_logical", "b05_slt_unsigned", "b08_rol_off_by_one", "b10_sll_unmasked_amount", "b11_negative_flag_bit14"]
+why_mcts: |
+  6 independent bugs drawn from a verified catalog; each is caught on its own by the public
+  smoke test, so every verified fix raises the public reward. A single trajectory must find and fix
+  all 6 without regressing; search keeps each fix as a node.

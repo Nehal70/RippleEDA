@@ -1,0 +1,95 @@
+{
+ "top": "alu16",
+ "rtl": "rtl/alu16.sv",
+ "prompt": "rtl/alu16.sv is a 16-bit combinational ALU. op: 0 ADD, 1 SUB, 2 AND, 3 OR,\n4 XOR, 5 SLL, 6 SRL, 7 SRA, 8 ROL, 9 ROR, 10 SLT (signed), 11 SLTU; shift and\nrotate amount is b[3:0]. Flags: z = (y == 0), n = y[15], c = carry-out for\nADD and borrow for SUB (1 when a < b unsigned), v = signed overflow for\nADD/SUB; c and v are 0 for all other ops. tb/tb_alu_smoke.sv is the\nblock's smoke test. Make it signoff-ready with an input-to-output delay of\nat most 5.5 ns. Keep the port list.",
+ "hidden_tb": [
+  "tb_alu.sv"
+ ],
+ "hidden_top": "tb",
+ "hidden_variants": [
+  {
+   "params": {
+    "SEED": 7
+   }
+  },
+  {
+   "params": {
+    "SEED": 99
+   }
+  }
+ ],
+ "smoke_tb": "tb_alu_smoke.sv",
+ "smoke_top": "tb_smoke",
+ "sta": {
+  "period_ns": 5.5,
+  "clock": "clk"
+ },
+ "bugs": {
+  "b01_sub_carry_inverted": [
+   [
+    "y = dif[15:0]; c = dif[16];",
+    "y = dif[15:0]; c = ~dif[16];"
+   ]
+  ],
+  "b02_sub_overflow_formula": [
+   [
+    "v = (a[15] != b[15]) && (dif[15] != a[15]);",
+    "v = (a[15] == b[15]) && (dif[15] != a[15]);"
+   ]
+  ],
+  "b03_sra_logical": [
+   [
+    "4'd7:  y = $signed(a) >>> sh;",
+    "4'd7:  y = a >> sh;"
+   ]
+  ],
+  "b04_ror_direction": [
+   [
+    "4'd9:  y = (a >> sh) | (a << rsh);",
+    "4'd9:  y = (a << sh) | (a >> rsh);"
+   ]
+  ],
+  "b05_slt_unsigned": [
+   [
+    "4'd10: y = {15'd0, $signed(a) < $signed(b)};",
+    "4'd10: y = {15'd0, a < b};"
+   ]
+  ],
+  "b06_zero_flag_low_byte": [
+   [
+    "assign z = (y == 16'd0);",
+    "assign z = (y[7:0] == 8'd0);"
+   ]
+  ],
+  "b07_add_carry_dropped": [
+   [
+    "y = sum[15:0]; c = sum[16];",
+    "y = sum[15:0]; c = 1'b0;"
+   ]
+  ],
+  "b08_rol_off_by_one": [
+   [
+    "4'd8:  y = (a << sh) | (a >> rsh);",
+    "4'd8:  y = (a << sh) | (a >> (rsh - 5'd1));"
+   ]
+  ],
+  "b09_sltu_signed": [
+   [
+    "4'd11: y = {15'd0, a < b};",
+    "4'd11: y = {15'd0, $signed(a) < $signed(b)};"
+   ]
+  ],
+  "b10_sll_unmasked_amount": [
+   [
+    "4'd5:  y = a << sh;",
+    "4'd5:  y = a << b;"
+   ]
+  ],
+  "b11_negative_flag_bit14": [
+   [
+    "assign n = y[15];",
+    "assign n = y[14];"
+   ]
+  ]
+ }
+}
