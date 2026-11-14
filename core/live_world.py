@@ -56,7 +56,14 @@ class LiveChipWorld(ToolSearch):
                 result=result,
                 depth=history_node.depth + 1,
             )
-        score, passed = terminal_score(latest, self.constraints)
+        # Baseline and weights ride along in the task's constraints dict when present.
+        score, passed = terminal_score(
+            latest,
+            self.constraints,
+            baseline=self.constraints.get("baseline"),
+            weights=self.constraints.get("weights"),
+            steps=history_node.depth,  # tool calls on this branch, root to end of playout
+        )
         if not passed and latest.get("error_count", 1) == 0:
             score = max(score, 0.35)
         return score, passed, "; ".join(story) or "no further calls"

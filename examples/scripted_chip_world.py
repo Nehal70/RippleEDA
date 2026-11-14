@@ -9,8 +9,16 @@ from __future__ import annotations
 
 from core.mcts_engine import ToolSearch
 from core.search_types import Action, Claim, Node, ToolResult
+from core.verifier import DEFAULT_WEIGHTS, terminal_score
 
 CONSTRAINTS = {"forbid_latches": True, "max_cells": 100, "max_cycles": 4}
+# Measured on the design as handed over: 70 cells. It hangs, so it has no cycle count;
+# the task's latency budget stands in as the cycle reference.
+BASELINE = {"total_cells": 70, "cycles": 4}
+WEIGHTS = DEFAULT_WEIGHTS
+# The scripted testbench has four checks: reset, idle, one beat, and the RREADY stall.
+# The unfixed design passes the first three and hangs on the fourth.
+TESTS_TOTAL = 4
 
 
 def _done(node: Node) -> set[str]:
@@ -61,11 +69,23 @@ class ScriptedChipWorld(ToolSearch):
             return result, claim, 0.82
         if action.tool == "verilator_simulate":
             hung = not fixed
-            raw = "SIM HUNG waiting on RREADY" if hung else "SIM PASS in 2 cycles"
+            passed = TESTS_TOTAL - 1 if hung else TESTS_TOTAL
+            raw = (
+                f"checks {passed}/{TESTS_TOTAL} passed; SIM HUNG waiting on RREADY"
+                if hung
+                else f"checks {passed}/{TESTS_TOTAL} passed; SIM PASS in 2 cycles"
+            )
             result = ToolResult(
                 True,
                 raw,
-                {"sim_hung": hung, "bug_fixed": not hung, "cycles": 2, "total_cells": cells},
+                {
+                    "sim_hung": hung,
+                    "bug_fixed": not hung,
+                    "tests_passed": passed,
+                    "tests_total": TESTS_TOTAL,
+                    "cycles": 2,
+                    "total_cells": cells,
+                },
             )
             claim = Claim({"sim_hung": hung, "cycles": 2}, "hung" if hung else "pass", raw)
             return result, claim, 0.55 if hung else 0.9
@@ -87,13 +107,44 @@ class ScriptedChipWorld(ToolSearch):
         return result, claim, 0.3
 
     def rollout(self, node: Node) -> tuple[float, bool, str]:
+        """Play the branch out, then let the verifier score the final tool truth.
+
+        The scripted outcomes are fixed per branch; only the number comes from
+        `terminal_score`, so the example exercises the real scoring code.
+        """
         done = _done(node)
         if "edit_extra_regs" in done:
-            return 0.35, False, "hang gone, but 140 cells is over the cap of 100"
-        if "edit_fsm" in done or (
-            node.action and node.action.tool == "verilator_simulate" and "edit_fsm" in done
-        ):
-            return 0.92, True, "hang gone, 80 cells, 2 cycles"
-        if node.action and node.action.tool == "verilator_simulate":
-            return 0.2, False, "played out from the sim: still needs an edit, this sample did not finish"
-        return 0.15, False, "played out from here and never fixed the hang"
+            truth = {
+                "sim_hung": False,
+                "tests_passed": TESTS_TOTAL,
+                "tests_total": TESTS_TOTAL,
+                "cycles": 2,
+                "total_cells": 140,
+            }
+            story = "hang gone, but 140 cells is over the cap of 100"
+        elif "edit_fsm" in done:
+            truth = {
+                "sim_hung": False,
+                "tests_passed": TESTS_TOTAL,
+                "tests_total": TESTS_TOTAL,
+                "cycles": 2,
+                "total_cells": 80,
+            }
+            story = "hang gone, 80 cells vs 70 at the start, 2 cycles"
+        elif "verilator_simulate" in done:
+            truth = {
+                "sim_hung": True,
+                "tests_passed": TESTS_TOTAL - 1,
+                "tests_total": TESTS_TOTAL,
+                "total_cells": 70,
+            }
+            story = (
+                f"played out from the sim: {TESTS_TOTAL - 1} of {TESTS_TOTAL} checks pass, "
+                "the stall check hangs, this sample never edited"
+            )
+        else:
+            truth = {"error_count": 0, "sim_hung": True}
+            story = "played out from here and never ran the testbench"
+        # Scripted playouts always need one more call (the confirming sim) past the node.
+        score, passed = terminal_score(truth, CONSTRAINTS, BASELINE, WEIGHTS, steps=node.depth + 1)
+        return score, passed, story

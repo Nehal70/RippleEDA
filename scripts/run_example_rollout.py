@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from core.mcts_engine import MCTS
-from examples.scripted_chip_world import CONSTRAINTS, ScriptedChipWorld
+from examples.scripted_chip_world import BASELINE, CONSTRAINTS, WEIGHTS, ScriptedChipWorld
 
 
 def main() -> None:
@@ -17,6 +17,11 @@ def main() -> None:
     print("TASK")
     print("  The slave hangs when RREADY drops. Keep cells at or under 100.")
     print("  Ripple does not get told which tool to call.")
+    print(f"  Baseline {BASELINE}  caps {CONSTRAINTS}")
+    print(
+        f"  Score bands: crash {WEIGHTS['crash']}, partial {WEIGHTS['fail_floor']}-{WEIGHTS['partial_ceiling']}, "
+        f"pass {WEIGHTS['pass_floor']}-1.0 ranked by PPA weights {WEIGHTS['ppa']}"
+    )
     print()
     for step in result.trace:
         print(f"Round {step.round_index}  {step.phase:8}  {step.node_id:6}  {step.detail}")
