@@ -17,3 +17,4 @@ results_*.log
 !scripts/calibrate_judge.py
 !scripts/or_agent.py
 !scripts/run_live_calibrated.py
+!scripts/probe_root_diversity.py
