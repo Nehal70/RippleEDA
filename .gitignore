@@ -1,0 +1,11 @@
+.venv/
+.env
+.cursor/mcp.json
+mcp4eda/
+examples/**/runs/
+__pycache__/
+*.pyc
+node_modules/
+scripts/*
+!scripts/run-mcp.sh
+!scripts/write_cursor_mcp.sh

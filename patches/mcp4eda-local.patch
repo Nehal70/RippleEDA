@@ -1,0 +1,96 @@
+diff --git a/c2rtl-verify-mcp/server.py b/c2rtl-verify-mcp/server.py
+index 1a13962..68b1be9 100644
+--- a/c2rtl-verify-mcp/server.py
++++ b/c2rtl-verify-mcp/server.py
+@@ -521,7 +521,7 @@ async def parse_natural_language_query(query: str, context: Dict) -> Dict[str, A
+     
+     # Property mining queries
+     prop_keywords = ["properties", "property", "mine", "discover", "extract", "find", "invariant", "temporal", "relationship"]
+-    elif any(word in query_lower for word in prop_keywords):
++    if any(word in query_lower for word in prop_keywords):
+         # Determine mining strategy
+         strategy = "all"
+         if "invariant" in query_lower:
+diff --git a/openlane-mcp/src/index.ts b/openlane-mcp/src/index.ts
+index be0ea01..5ecdd2b 100644
+--- a/openlane-mcp/src/index.ts
++++ b/openlane-mcp/src/index.ts
+@@ -31,6 +31,9 @@ interface ServerConfig {
+   workDir?: string;
+   enableGpu?: boolean;
+   maxRunTime?: number;
++  pdkVolume?: string;
++  pdkRoot?: string;
++  pdk?: string;
+ }
+ 
+ class OpenLaneServer {
+@@ -39,12 +42,15 @@ class OpenLaneServer {
+ 
+   constructor(config: ServerConfig = {}) {
+     this.config = {
+-      containerExecutable: config.containerExecutable || 'docker',
+-      openlanePdkImage: config.openlanePdkImage || 'efabless/openlane:latest',
+-      openlaneFlowImage: config.openlaneFlowImage || 'efabless/openlane:latest',
+-      workDir: config.workDir || path.join(os.homedir(), 'openlane-mcp-workspace'),
++      containerExecutable: config.containerExecutable || process.env.CONTAINER_EXECUTABLE || 'docker',
++      openlanePdkImage: config.openlanePdkImage || process.env.OPENLANE_IMAGE || 'efabless/openlane:latest',
++      openlaneFlowImage: config.openlaneFlowImage || process.env.OPENLANE_IMAGE || 'efabless/openlane:latest',
++      workDir: config.workDir || process.env.WORK_DIR || path.join(os.homedir(), 'openlane-mcp-workspace'),
+       enableGpu: config.enableGpu ?? false,
+       maxRunTime: config.maxRunTime || 3600000, // 1 hour default
++      pdkVolume: config.pdkVolume || process.env.OPENLANE_PDK_VOLUME || 'ripple-eda-pdks',
++      pdkRoot: config.pdkRoot || process.env.PDK_ROOT || '/root/.volare',
++      pdk: config.pdk || process.env.PDK || 'sky130A',
+     };
+ 
+     this.server = new Server(
+@@ -746,6 +752,17 @@ class OpenLaneServer {
+     await fs.mkdir(this.config.workDir!, { recursive: true });
+   }
+ 
++  private pdkArgs(): string[] {
++    if (!this.config.pdkVolume || !this.config.pdkRoot) {
++      return [];
++    }
++    return [
++      '-v', `${this.config.pdkVolume}:${this.config.pdkRoot}`,
++      '-e', `PDK_ROOT=${this.config.pdkRoot}`,
++      '-e', `PDK=${this.config.pdk || 'sky130A'}`,
++    ];
++  }
++
+   private async checkContainerRuntime(): Promise<boolean> {
+     try {
+       const { stdout } = await execAsync(`${this.config.containerExecutable} --version`);
+@@ -773,6 +790,7 @@ class OpenLaneServer {
+         this.config.containerExecutable!,
+         'run',
+         '--rm',
++        ...this.pdkArgs(),
+         '-v', `${designPath}:/openlane/designs/${designName}`,
+         '-v', `${outputDir}:/openlane/designs/${designName}/runs`,
+         '-e', `DESIGN_NAME=${designName}`,
+@@ -865,6 +883,7 @@ ${result.logs ? `\nFlow Summary:\n${result.logs}` : ''}`,
+         this.config.containerExecutable!,
+         'run',
+         '--rm',
++        ...this.pdkArgs(),
+         '-v', `${tempDesignDir}:/openlane/designs/${designName}`,
+         '-e', 'RUN_SYNTHESIS=1',
+         '-e', 'QUIT_ON_SYNTH_DONE=1',
+@@ -906,6 +925,7 @@ ${result.logs || ''}`,
+         this.config.containerExecutable!,
+         'run',
+         '--rm',
++        ...this.pdkArgs(),
+         '-v', `${designPath}:/openlane/designs/${designName}`,
+         this.config.openlaneFlowImage!,
+         'sta.tcl',
+diff --git a/rtl-parser-mcp/src/parsers/verible-ast-analyzer.ts b/rtl-parser-mcp/src/parsers/verible-ast-analyzer.ts
+new file mode 100644
+index 0000000..b7e0c0a
+--- /dev/null
++++ b/rtl-parser-mcp/src/parsers/verible-ast-analyzer.ts
+@@ -0,0 +1 @@
++export class VeribleASTAnalyzer {}
