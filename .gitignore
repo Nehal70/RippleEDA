@@ -21,3 +21,5 @@ results_*.log
 !scripts/run_linear_baseline.py
 
 tasks_v1/
+
+.env.*

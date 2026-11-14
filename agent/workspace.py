@@ -9,6 +9,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import os
 import re
 import shutil
 import tempfile
@@ -86,7 +87,8 @@ TOOL_SCHEMAS = [
                        "Optional split: list of small select inputs to case-split on.",
         "parameters": {"type": "object", "properties": {"split": {"type": "array", "items": {"type": "string"}}}}}},
     {"type": "function", "function": {
-        "name": "run_shell", "description": "Run a short shell command inside the workspace (python3, cat, grep, sed...). 60 s limit.",
+        "name": "run_shell", "description": "Run a short shell command inside the workspace (python3, cat, grep, sed, iverilog...). "
+                                            "Sandboxed: only the workspace directory is visible. 60 s limit.",
         "parameters": {"type": "object", "properties": {"cmd": {"type": "string"}}, "required": ["cmd"]}}},
     {"type": "function", "function": {
         "name": "submit", "description": "Declare the task finished. The workspace is then graded by the hidden signoff suite.",
@@ -251,7 +253,25 @@ class Workspace:
         return _clip(f"equivalent={r['ok']} {r['metrics']}\n" + r["log"], 2000)
 
     def t_run_shell(self, cmd):
+        """Shell confined to the workspace. Measured: an unsandboxed shell lets Ripple `find / -name '*.sv'` its way
+        to tasks/<id>/tb and solution/ (6 of the first 7 baseline runs did), so by default the command runs in a
+        throw-away container with ONLY the workspace mounted (RIPPLE_SHELL_SANDBOX=docker; `none` = host shell)."""
+        import shlex
         import subprocess
+        mode = os.environ.get("RIPPLE_SHELL_SANDBOX", "docker")
+        if mode == "docker":
+            image = os.environ.get("RIPPLE_SHELL_IMAGE", "efabless/openlane:latest")
+            argv = ["docker", "run", "--rm", "-i", "--network", "none", "--user", f"{os.getuid()}:{os.getgid()}",
+                    "-v", f"{self.root}:/ws", "-w", "/ws", "-e", "HOME=/ws", "--entrypoint", "bash", image,
+                    "-c", f"timeout 55 bash -c {shlex.quote(cmd)}"]
+            try:
+                p = subprocess.run(argv, capture_output=True, text=True, timeout=75)
+                out = p.stdout + p.stderr
+                if p.returncode == 124:
+                    out += "\ntimeout"
+                return _clip(out) or "(no output)"
+            except subprocess.TimeoutExpired:
+                return "timeout"
         try:
             p = subprocess.run(cmd, shell=True, cwd=self.root, capture_output=True, text=True, timeout=60)
             return _clip(p.stdout + p.stderr) or "(no output)"

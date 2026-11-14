@@ -1,0 +1,142 @@
+
+==============================================================================
+ROOT PROPOSAL DIVERSITY  k=3 temp=0.8  tasks=50  calls=60
+==============================================================================
+
+Per task (first call): unique tools / unique (tool,args) keys / tools proposed
+  G_afifo_01   tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_afifo_02   tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_afifo_03   tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_afifo_04   tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_afifo_05   tools=3 keys=3  ['verible_lint', 'verilator_compile', 'yosys_analyze']  [plain]
+  G_alu_01     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_alu_02     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'yosys_analyze']  [forced]
+  G_alu_03     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_alu_04     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_alu_05     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_alu_06     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_alu_07     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_alu_08     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_div_01     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_div_02     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'yosys_analyze']  [plain]
+  G_div_03     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'yosys_analyze']  [plain]
+  G_div_04     tools=3 keys=3  ['verilator_lint', 'yosys_analyze', 'yosys_synth']  [plain]
+  G_div_05     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'yosys_analyze']  [plain]
+  G_div_06     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'yosys_analyze']  [plain]
+  G_fifo_01    tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_fifo_02    tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_fifo_03    tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_fifo_04    tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [forced]
+  G_fifo_05    tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_fifo_06    tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_fifo_07    tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [forced]
+  G_irq_01     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_irq_02     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_irq_03     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_irq_04     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_irq_05     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_irq_06     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_mac_01     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_mac_02     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'yosys_analyze']  [forced]
+  G_mac_03     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_mac_04     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_mac_05     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'yosys_analyze']  [forced]
+  G_mac_06     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_spi_01     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'yosys_analyze']  [plain]
+  G_spi_02     tools=3 keys=3  ['yosys_analyze', 'verible_lint', 'verilator_compile']  [plain]
+  G_spi_03     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_spi_04     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [forced]
+  G_spi_05     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_spi_06     tools=3 keys=3  ['verible_lint', 'verilator_compile', 'yosys_analyze']  [plain]
+  G_uart_01    tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_uart_02    tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_uart_03    tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+  G_uart_04    tools=3 keys=3  ['verible_lint', 'verilator_compile', 'yosys_synth']  [plain]
+  G_uart_05    tools=3 keys=3  ['verible_lint', 'verilator_simulate', 'yosys_analyze']  [plain]
+  G_uart_06    tools=3 keys=3  ['verible_lint', 'verilator_compile', 'verilator_simulate']  [plain]
+
+Calls: 60  ok=60  failed=0
+  answer path that succeeded: {'plain': 54, 'forced': 6}
+  plain (live) path: 60 tries, empty=0, unparseable=5, http_error=0, ok=55; finish_reason={'stop': 60}
+  plain path returned hidden reasoning in 39 tries (mean 7099 chars)
+
+Distinct (tool,args) candidates out of 3 [Action.key()]: 3->60 (100%)
+Distinct tool NAMES out of 3: 3->60 (100%)
+Number of actions returned: {3: 60}
+Distinct AS-EXECUTED by core/tool_runner (tool family + path it reads) out of 3: 1->45 (75%), 2->15 (25%)
+
+Most common FIRST-choice tools: verible_lint=58, verilator_lint=1, yosys_analyze=1
+All proposed tools:            verible_lint=59, verilator_compile=58, verilator_simulate=47, yosys_analyze=13, yosys_synth=2, verilator_lint=1
+Most common tool SETS:          verible_lint+verilator_compile+verilator_simulate=46; verible_lint+verilator_compile+yosys_analyze=11; verilator_lint+yosys_analyze+yosys_synth=1; verible_lint+verilator_compile+yosys_synth=1; verible_lint+verilator_simulate+yosys_analyze=1
+
+Actions: 180 total; banned=0, nonexistent tool=1, bad args (path does not resolve)=21
+Calls with >=1 banned=0/60 (0%), nonexistent=1/60 (2%), bad args=17/60 (28%)
+Arg keys used:                  file=91, files=47, top=36, binary=20, testbench=18, flags=10, design=9, top_module=4, timeout=4, include=3, input_file=3, target=3
+Actions with EMPTY args: 3/180; actions whose args the runner IGNORES (no filepath/design key): 165/180 -> both run on the task design path
+Unresolvable path args by key:  binary=16, build=2, build_dir=1, cmd=1, waves=1, wave=1, timescale=1, dump_vcd=1
+
+Latency: mean 40.4s  max 171.2s per call (incl. fallback)
+Cost: $0.1067 from OpenRouter usage.cost; tokens 60138 in / 167991 out
+
+Repeat calls on 10 tasks (10 with both calls ok):
+  candidate SET (tool,args) differed between call 1 and 2: 10/10 (100%); tool-name set differed: 2/10; as-executed set differed: 3/10
+  mean Jaccard overlap of key sets: 0.02
+    G_afifo_03   1st=['verible_lint', 'verilator_compile', 'verilator_simulate']  2nd=['verible_lint', 'verilator_compile', 'verilator_simulate']  DIFF
+    G_div_04     1st=['verilator_lint', 'yosys_analyze', 'yosys_synth']  2nd=['verible_lint', 'verilator_compile', 'verilator_simulate']  DIFF
+    G_fifo_01    1st=['verible_lint', 'verilator_compile', 'verilator_simulate']  2nd=['verible_lint', 'verilator_compile', 'verilator_simulate']  DIFF
+    G_fifo_06    1st=['verible_lint', 'verilator_compile', 'verilator_simulate']  2nd=['verible_lint', 'verilator_compile', 'verilator_simulate']  DIFF
+    G_fifo_07    1st=['verible_lint', 'verilator_compile', 'verilator_simulate']  2nd=['verible_lint', 'verilator_compile', 'verilator_simulate']  DIFF
+    G_irq_01     1st=['verible_lint', 'verilator_compile', 'verilator_simulate']  2nd=['verible_lint', 'verilator_compile', 'verilator_simulate']  DIFF
+    G_irq_05     1st=['verible_lint', 'verilator_compile', 'verilator_simulate']  2nd=['verible_lint', 'verilator_compile', 'verilator_simulate']  DIFF
+    G_irq_06     1st=['verible_lint', 'verilator_compile', 'verilator_simulate']  2nd=['verible_lint', 'verilator_compile', 'verilator_simulate']  DIFF
+    G_mac_01     1st=['verible_lint', 'verilator_compile', 'verilator_simulate']  2nd=['verible_lint', 'verilator_compile', 'verilator_simulate']  DIFF
+    G_uart_05    1st=['verible_lint', 'verilator_simulate', 'yosys_analyze']  2nd=['verible_lint', 'verilator_compile', 'verilator_simulate']  DIFF
+
+------------------------------------------------------------------------------
+5 verbatim examples (first call; rationale truncated)
+------------------------------------------------------------------------------
+
+[G_afifo_01]  distinct keys=3/3  as-executed=1  via plain  (this tool set seen in 36 first calls)
+  task: rtl/async_fifo.sv is a depth-8 dual-clock FIFO with gray-coded pointers crossing domains through synchronisers...
+  1. verible_lint  args={"files": ["/mnt/c/Users/nehal/Documents/Projects/RippleEDA/tasks/G_afifo_01/start/rtl/async_fifo.sv"]}  
+     rationale: Lint first to catch style/synthesis issues in the FIFO RTL before signoff.
+  2. verilator_compile  args={"files": ["/mnt/c/Users/nehal/Documents/Projects/RippleEDA/tasks/G_afifo_01/start/rtl/async_fifo.sv", "/mnt/c/Users/nehal/Documents/Projects/RippleEDA/tasks/G_afifo_01/start/tb/tb_smoke_afifo.sv"], "top": "tb_smoke_afifo"}  
+     rationale: Compile design plus smoke testbench to verify syntax and elaboration.
+  3. verilator_simulate  args={"top": "tb_smoke_afifo"}  
+     rationale: Run the smoke test to validate FIFO functional behavior before timing closure.
+
+[G_alu_02]  distinct keys=3/3  as-executed=2  via forced  (this tool set seen in 11 first calls)
+  task: rtl/alu16.sv is a 16-bit combinational ALU. op: 0 ADD, 1 SUB, 2 AND, 3 OR, 4 XOR, 5 SLL, 6 SRL, 7 SRA, 8 ROL, ...
+  1. verible_lint  args={"file": "/mnt/c/Users/nehal/Documents/Projects/RippleEDA/tasks/G_alu_02/start/rtl/alu16.sv"}  
+     rationale: Run lint first to catch syntax/style issues and confirm the file parses cleanly before deeper checks.
+  2. verilator_compile  args={"file": "/mnt/c/Users/nehal/Documents/Projects/RippleEDA/tasks/G_alu_02/start/rtl/alu16.sv", "tb": "/mnt/c/Users/nehal/Documents/Projects/RippleEDA/tasks/G_alu_02/start/tb/tb_alu_smoke.sv"}  
+     rationale: Compile the design with its testbench to catch elaboration/simulation issues before timing work.
+  3. yosys_analyze  args={"file": "/mnt/c/Users/nehal/Documents/Projects/RippleEDA/tasks/G_alu_02/start/rtl/alu16.sv"}  
+     rationale: Analyze the netlist to verify structure and prepare for synthesis/timing review.
+
+[G_div_04]  distinct keys=3/3  as-executed=2  via plain  (this tool set seen in 1 first calls)
+  task: rtl/div16.sv is an unsigned 16/8 divider with a start/done handshake (divide-by-zero: q=FFFF, r=a[7:0]). Make ...
+  1. verilator_lint  args={"file": "/mnt/c/Users/nehal/Documents/Projects/RippleEDA/tasks/G_div_04/start/rtl/div16.sv"}  <NONEXISTENT>
+     rationale: Lint the divider to catch any coding issues (e.g., the always_ff missing else on done reset, width mismatches) before synthesis.
+  2. yosys_analyze  args={"file": "/mnt/c/Users/nehal/Documents/Projects/RippleEDA/tasks/G_div_04/start/rtl/div16.sv"}  
+     rationale: Analyze the design to inspect hierarchy, cells, and any obvious structural issues before running synthesis.
+  3. yosys_synth  args={"file": "/mnt/c/Users/nehal/Documents/Projects/RippleEDA/tasks/G_div_04/start/rtl/div16.sv", "target": "sky130hd"}  
+     rationale: Synthesize with sky130hd to estimate cell count/area against the 2800 um^2 budget and check whether the combinational paths can meet 2.6 ns.
+
+[G_uart_04]  distinct keys=3/3  as-executed=2  via plain  (this tool set seen in 1 first calls)
+  task: rtl/uart_tx.sv is an 8N1 UART transmitter (LSB first, idle high) parameterised by CLKS_PER_BIT (any value >= 2...
+  1. verible_lint  args={"files": ["rtl/uart_tx.sv"]}  
+     rationale: Lint the transmitter RTL first to catch style, reset, and coding issues before any downstream flow.
+  2. verilator_compile  args={"files": ["tb/tb_smoke_uart.sv", "rtl/uart_tx.sv"]}  
+     rationale: Compile the smoke testbench together with the DUT to catch elaboration/compile errors early.
+  3. yosys_synth  args={"files": ["rtl/uart_tx.sv"], "top": "uart_tx", "clk_period": "4ns"}  
+     rationale: Synthesize the design at a 4 ns clock to confirm it maps cleanly and check the resulting gate count.
+
+[G_uart_05]  distinct keys=3/3  as-executed=2  via plain  (this tool set seen in 1 first calls)
+  task: rtl/uart_tx.sv is an 8N1 UART transmitter (LSB first, idle high) parameterised by CLKS_PER_BIT (any value >= 2...
+  1. verible_lint  args={"file": "/mnt/c/Users/nehal/Documents/Projects/RippleEDA/tasks/G_uart_05/start/rtl/uart_tx.sv"}  
+     rationale: Fastest way to catch obvious style/structural issues before simulation.
+  2. verilator_simulate  args={"file": "/mnt/c/Users/nehal/Documents/Projects/RippleEDA/tasks/G_uart_05/start/tb/tb_smoke_uart.sv", "top": "tb_smoke_uart"}  
+     rationale: Run the provided smoke testbench to check frame timing and back-to-back behavior.
+  3. yosys_analyze  args={"file": "/mnt/c/Users/nehal/Documents/Projects/RippleEDA/tasks/G_uart_05/start/rtl/uart_tx.sv"}  
+     rationale: Confirm the design elaborates cleanly and inspect the inferred state/counter logic.

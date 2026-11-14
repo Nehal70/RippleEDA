@@ -98,7 +98,9 @@ def summarize(out_dir: Path, n_total: int | None = None):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", default=str(ROOT / "results" / "linear_baseline_v2"))
+    ap.add_argument("--task-root", default=str(ROOT / "tasks"), help="directory holding G_* task folders")
     ap.add_argument("--tasks", nargs="*", help="explicit task ids (default: every tasks/G_*)")
+    ap.add_argument("--tasks-file", help="file with one task id per line")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--max-calls", type=int, default=30)
@@ -113,9 +115,12 @@ def main():
 
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
-    task_dirs = sorted(p for p in (ROOT / "tasks").glob(TASK_GLOB) if (p / "task.yaml").exists())
-    if args.tasks:
-        task_dirs = [p for p in task_dirs if p.name in set(args.tasks)]
+    task_dirs = sorted(p for p in Path(args.task_root).glob(TASK_GLOB) if (p / "task.yaml").exists())
+    wanted = set(args.tasks or [])
+    if args.tasks_file:
+        wanted |= {l.strip() for l in Path(args.tasks_file).read_text().splitlines() if l.strip()}
+    if wanted:
+        task_dirs = [p for p in task_dirs if p.name in wanted]
     if args.limit:
         task_dirs = task_dirs[: args.limit]
     n_total = len(task_dirs)
