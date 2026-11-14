@@ -9,3 +9,5 @@ node_modules/
 scripts/*
 !scripts/run-mcp.sh
 !scripts/write_cursor_mcp.sh
+!scripts/run_live.py
+!scripts/run_example_rollout.py
