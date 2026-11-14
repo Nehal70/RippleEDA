@@ -6,22 +6,16 @@ top: mac_pipe
 rtl: [rtl/mac_pipe.sv]
 lib: sky130hd
 prompt: |
-  rtl/mac_pipe.sv is a 3-stage pipelined multiply-accumulate: a sample with
-  in_valid=1 produces out_valid=1 three cycles later; clear=1 on a sample makes
-  acc restart from that sample's product. It has been reported to misbehave.
-  tb/tb_smoke.sv is the block's
-  smoke test. Make it signoff-ready at 5 ns. Keep the port list.
-  tb/tb_smoke_mac.sv is the block's smoke test.
-public_checks:   # run by the honest PRM (files from the original start/, agent edits ignored)
-  - {type: sim, tb: [tb/tb_smoke_mac.sv], top: tb_smoke}
+  rtl/mac_pipe.sv isn't passing. Fix it. Keep the port list. It must close timing at 5 ns.
 checks:
   - {type: lint, weight: 1}
   - {type: sim, tb: ["tb/tb_mac.sv"], top: tb, weight: 4, variants: [{}]}
-  - {type: synth, no_latches: true, weight: 1}
+  - {type: synth, no_latches: true, max_cells: 488, weight: 1}
   - {type: sta, period_ns: 5.0, clock: clk, weight: 1}
 generated_from: mac
 bugs: ["m1_valids_not_reset", "m2_clear_not_pipelined", "m4_out_valid_early", "m5_accumulate_when_idle"]
+reference_cells: 443
 why_mcts: |
-  4 independent bugs drawn from a verified catalog; each is caught on its own by the public
-  smoke test, so every verified fix raises the public reward. A single trajectory must find and fix
-  all 4 without regressing; search keeps each fix as a node.
+  4 independent bugs drawn from a verified catalog. The prompt carries no spec and no testbench:
+  the behavioural contract is only in the SPEC header of the RTL, so the agent must read it, write its
+  own tests, and find and fix all 4 bugs without regressing; search keeps each verified fix as a node.

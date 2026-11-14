@@ -6,24 +6,16 @@ top: irq_ctrl
 rtl: [rtl/irq_ctrl.sv]
 lib: sky130hd
 prompt: |
-  rtl/irq_ctrl.sv is an 8-source interrupt controller. For a source with
-  edge_mode[i]=1, pending[i] latches on a rising edge of src[i] (even while
-  en[i]=0) and stays set until acknowledged. For edge_mode[i]=0 (level),
-  pending[i] simply follows src[i] and ack has no effect. irq = |(pending & en);
-  id is the lowest index i with pending[i] & en[i]. A one-cycle ack while irq=1
-  clears the edge-pending bit of the current id; a new edge arriving in the
-  same cycle wins over the clear. tb/tb_irq_smoke.sv is the block's smoke test.
-  Make it signoff-ready at 2.5 ns. Keep the port list.
-public_checks:   # run by the honest PRM (files from the original start/, agent edits ignored)
-  - {type: sim, tb: [tb/tb_irq_smoke.sv], top: tb_smoke}
+  rtl/irq_ctrl.sv isn't passing. Fix it. Keep the port list. It must close timing at 2.5 ns.
 checks:
   - {type: lint, weight: 1}
   - {type: sim, tb: ["tb/tb_irq.sv"], top: tb, weight: 4, variants: [{"params": {"SEED": 7}}, {"params": {"SEED": 4242}}]}
-  - {type: synth, no_latches: true, weight: 1}
+  - {type: synth, no_latches: true, max_cells: 84, weight: 1}
   - {type: sta, period_ns: 2.5, clock: clk, weight: 1}
 generated_from: irq
 bugs: ["b2_ack_clears_all", "b3_priority_reversed", "b5_clear_beats_new_edge", "b6_irq_ignores_enable", "b8_id_from_unmasked"]
+reference_cells: 76
 why_mcts: |
-  5 independent bugs drawn from a verified catalog; each is caught on its own by the public
-  smoke test, so every verified fix raises the public reward. A single trajectory must find and fix
-  all 5 without regressing; search keeps each fix as a node.
+  5 independent bugs drawn from a verified catalog. The prompt carries no spec and no testbench:
+  the behavioural contract is only in the SPEC header of the RTL, so the agent must read it, write its
+  own tests, and find and fix all 5 bugs without regressing; search keeps each verified fix as a node.

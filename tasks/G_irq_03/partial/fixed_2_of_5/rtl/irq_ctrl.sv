@@ -1,8 +1,13 @@
-// 8-source interrupt controller.
-//  edge_mode[i]=1: pending[i] latches on a rising edge of src[i] (even while en[i]=0) and stays set until acknowledged.
-//  edge_mode[i]=0: level source, pending[i] = src[i] (not sticky, ack has no effect).
-//  irq = |(pending & en); id = lowest index i with pending[i] & en[i] (0 when none).
-//  ack (one cycle, while irq=1) clears the edge-pending bit of the current id; an edge arriving in the same cycle wins.
+// ----------------------------------------------------------------------------
+// SPEC: irq_ctrl
+// 8-source interrupt controller. For a source with edge_mode[i]=1, pending[i]
+// latches on a rising edge of src[i] (even while en[i]=0) and stays set until
+// acknowledged. For edge_mode[i]=0 (level), pending[i] simply follows src[i]
+// and ack has no effect. irq = |(pending & en); id is the lowest index i with
+// pending[i] & en[i] (0 when none). A one-cycle ack while irq=1 clears the
+// edge-pending bit of the current id; a new edge arriving in the same cycle
+// wins over the clear.
+// ----------------------------------------------------------------------------
 module irq_ctrl (
   input  logic       clk,
   input  logic       rst_n,

@@ -1,4 +1,11 @@
-// UART transmitter, 8N1, LSB first.
+// ----------------------------------------------------------------------------
+// SPEC: uart_tx
+// 8N1 UART transmitter (LSB first, idle high) parameterised by CLKS_PER_BIT
+// (any value >= 2). tx_start while idle sends tx_data as one start bit (low),
+// eight data bits LSB first and one stop bit (high), each lasting exactly
+// CLKS_PER_BIT clock cycles. tx_busy covers the whole frame (start bit
+// through stop bit) and frames may be sent back-to-back.
+// ----------------------------------------------------------------------------
 module uart_tx #(
   parameter int CLKS_PER_BIT = 16
 ) (

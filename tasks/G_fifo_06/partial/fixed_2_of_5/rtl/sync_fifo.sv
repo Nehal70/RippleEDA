@@ -1,4 +1,13 @@
-// Synchronous FWFT FIFO (reference solution)
+// ----------------------------------------------------------------------------
+// SPEC: sync_fifo
+// Parameterised synchronous first-word-fall-through FIFO (WIDTH=8, DEPTH=8,
+// DEPTH a power of two, active-low async reset). First-word-fall-through:
+// rdata always shows the oldest stored word; rd_en pops it at the clock edge.
+// wr_en pushes wdata when the FIFO is not full; rd_en pops when it is not
+// empty; a push and a pop may happen in the same cycle. count is the number
+// of stored words; full is asserted when count equals DEPTH and empty when
+// count is zero. After reset the FIFO is empty.
+// ----------------------------------------------------------------------------
 module sync_fifo #(
   parameter int WIDTH = 8,
   parameter int DEPTH = 8          // power of two

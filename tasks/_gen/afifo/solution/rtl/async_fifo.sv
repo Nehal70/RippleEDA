@@ -1,4 +1,14 @@
-// Dual-clock FIFO (Cummings style): binary+gray pointers, 2-flop synchronisers.
+// ----------------------------------------------------------------------------
+// SPEC: async_fifo
+// Depth-8 (2**AW entries of WIDTH bits) dual-clock FIFO with gray-coded
+// pointers crossing clock domains through 2-flop synchronisers (Cummings
+// style). It must work for any ratio between the write and read clocks.
+// Write side (wclk, async active-low wrst_n): winc pushes wdata when the FIFO
+// is not wfull; a push while wfull is ignored.
+// Read side (rclk, async active-low rrst_n): rdata shows the oldest stored
+// word; rinc pops it when the FIFO is not rempty; a pop while rempty is
+// ignored. After reset the FIFO is empty (rempty=1, wfull=0).
+// ----------------------------------------------------------------------------
 module async_fifo #(
   parameter int WIDTH = 8,
   parameter int AW    = 3

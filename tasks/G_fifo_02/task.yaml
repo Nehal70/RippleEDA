@@ -6,20 +6,16 @@ top: sync_fifo
 rtl: [rtl/sync_fifo.sv]
 lib: sky130hd
 prompt: |
-  rtl/sync_fifo.sv is a parameterised synchronous first-word-fall-through
-  FIFO (WIDTH=8, DEPTH=8, active-low async reset). It doesn't work. Make it
-  signoff-ready: <= 3300 um^2 on sky130hd at a 5 ns clock. Keep the port list.
-  tb/tb_smoke_fifo.sv is the block's smoke test.
-public_checks:   # run by the honest PRM (files from the original start/, agent edits ignored)
-  - {type: sim, tb: [tb/tb_smoke_fifo.sv], top: tb_smoke}
+  rtl/sync_fifo.sv isn't passing. Fix it. Keep the port list. It must close timing at 5 ns.
 checks:
   - {type: lint, weight: 1}
   - {type: sim, tb: ["tb/tb_fifo.sv"], top: tb, weight: 4, variants: [{"params": {"DEPTH": 8}}, {"params": {"DEPTH": 16, "CYCLES": 4000}}]}
-  - {type: synth, no_latches: true, weight: 1}
+  - {type: synth, no_latches: true, max_cells: 213, weight: 1}
   - {type: sta, period_ns: 5.0, clock: clk, weight: 1}
 generated_from: fifo
 bugs: ["f2_read_when_empty", "f3_full_one_early", "f6_write_at_read_ptr", "f7_read_ptr_skips", "f9_wptr_not_reset"]
+reference_cells: 193
 why_mcts: |
-  5 independent bugs drawn from a verified catalog; each is caught on its own by the public
-  smoke test, so every verified fix raises the public reward. A single trajectory must find and fix
-  all 5 without regressing; search keeps each fix as a node.
+  5 independent bugs drawn from a verified catalog. The prompt carries no spec and no testbench:
+  the behavioural contract is only in the SPEC header of the RTL, so the agent must read it, write its
+  own tests, and find and fix all 5 bugs without regressing; search keeps each verified fix as a node.

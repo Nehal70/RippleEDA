@@ -6,21 +6,16 @@ top: uart_tx
 rtl: [rtl/uart_tx.sv]
 lib: sky130hd
 prompt: |
-  rtl/uart_tx.sv is an 8N1 UART transmitter (LSB first, idle high)
-  parameterised by CLKS_PER_BIT (any value >= 2). tx_busy covers the whole
-  frame and frames may be sent back-to-back. Make it signoff-ready at 4 ns.
-  Keep the port list.
-  tb/tb_smoke_uart.sv is the block's smoke test.
-public_checks:   # run by the honest PRM (files from the original start/, agent edits ignored)
-  - {type: sim, tb: [tb/tb_smoke_uart.sv], top: tb_smoke}
+  rtl/uart_tx.sv isn't passing. Fix it. Keep the port list. It must close timing at 4 ns.
 checks:
   - {type: lint, weight: 1}
   - {type: sim, tb: ["tb/tb_uart.sv"], top: tb, weight: 4, variants: [{"params": {"CPB": 4}}, {"params": {"CPB": 16}}, {"params": {"CPB": 300}}]}
-  - {type: synth, no_latches: true, weight: 1}
+  - {type: synth, no_latches: true, max_cells: 98, weight: 1}
   - {type: sta, period_ns: 4.0, clock: clk, weight: 1}
 generated_from: uart
 bugs: ["u2_msb_first", "u4_busy_drops_in_stop", "u5_start_bit_high", "u6_seven_data_bits"]
+reference_cells: 89
 why_mcts: |
-  4 independent bugs drawn from a verified catalog; each is caught on its own by the public
-  smoke test, so every verified fix raises the public reward. A single trajectory must find and fix
-  all 4 without regressing; search keeps each fix as a node.
+  4 independent bugs drawn from a verified catalog. The prompt carries no spec and no testbench:
+  the behavioural contract is only in the SPEC header of the RTL, so the agent must read it, write its
+  own tests, and find and fix all 4 bugs without regressing; search keeps each verified fix as a node.

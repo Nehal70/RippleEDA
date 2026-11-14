@@ -1,5 +1,12 @@
-// SPI master: 8-bit transfers, CPOL/CPHA modes 0-3, MSB- or LSB-first, SCLK half-period = div clk cycles (div >= 1).
-// cs_n is asserted one half-period before the first SCLK edge and released one half-period after the last.
+// ----------------------------------------------------------------------------
+// SPEC: spi_master
+// 8-bit SPI master: all four CPOL/CPHA modes, MSB- or LSB-first (lsb_first),
+// SCLK half-period of `div` clock cycles (div 1..255). SCLK idles at CPOL.
+// start (while not busy) begins one 8-bit transfer of tx. cs_n goes low one
+// half-period before the first SCLK edge and returns high one half-period
+// after the last edge, at which point busy drops, done pulses for one cycle
+// and rx holds the received byte.
+// ----------------------------------------------------------------------------
 module spi_master (
   input  logic       clk,
   input  logic       rst_n,

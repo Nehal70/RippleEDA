@@ -1,6 +1,11 @@
-// 16-bit ALU. op: 0 ADD, 1 SUB, 2 AND, 3 OR, 4 XOR, 5 SLL, 6 SRL, 7 SRA, 8 ROL, 9 ROR, 10 SLT (signed), 11 SLTU.
-// Shift/rotate amount = b[3:0]. Flags: z = (y == 0), n = y[15], c = carry-out (ADD) / borrow (SUB, 1 when a < b
-// unsigned), v = signed overflow (ADD/SUB only). c and v are 0 for every other op.
+// ----------------------------------------------------------------------------
+// SPEC: alu16
+// 16-bit combinational ALU. op: 0 ADD, 1 SUB, 2 AND, 3 OR, 4 XOR, 5 SLL,
+// 6 SRL, 7 SRA, 8 ROL, 9 ROR, 10 SLT (signed), 11 SLTU; shift and rotate
+// amount is b[3:0]. Flags: z = (y == 0), n = y[15], c = carry-out for ADD and
+// borrow for SUB (1 when a < b unsigned), v = signed overflow for ADD/SUB;
+// c and v are 0 for all other ops.
+// ----------------------------------------------------------------------------
 module alu16 (
   input  logic [15:0] a,
   input  logic [15:0] b,

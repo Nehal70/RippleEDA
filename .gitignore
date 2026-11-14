@@ -18,3 +18,6 @@ results_*.log
 !scripts/or_agent.py
 !scripts/run_live_calibrated.py
 !scripts/probe_root_diversity.py
+!scripts/run_linear_baseline.py
+
+tasks_v1/

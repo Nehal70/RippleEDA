@@ -22,6 +22,8 @@ class Usage:
     def __init__(self):
         self.lock = threading.Lock()
         self.calls = self.prompt = self.completion = 0
+        self.billed = 0.0          # USD reported by OpenRouter (usage.cost) when available
+        self.billed_calls = 0
 
     def add(self, u):
         with self.lock:
@@ -29,13 +31,22 @@ class Usage:
             if u:
                 self.prompt += getattr(u, "prompt_tokens", 0) or 0
                 self.completion += getattr(u, "completion_tokens", 0) or 0
+                c = getattr(u, "cost", None)
+                if c is None:
+                    c = (getattr(u, "model_extra", None) or {}).get("cost")
+                if c is not None:
+                    self.billed += float(c)
+                    self.billed_calls += 1
 
     def cost(self):
+        """OpenRouter-billed USD when every call reported it, else the token-price estimate."""
+        if self.billed_calls and self.billed_calls == self.calls:
+            return self.billed
         return self.prompt * PRICE_IN + self.completion * PRICE_OUT
 
     def as_dict(self):
         return {"calls": self.calls, "prompt_tokens": self.prompt, "completion_tokens": self.completion,
-                "usd": round(self.cost(), 4)}
+                "usd": round(self.cost(), 4), "usd_billed": round(self.billed, 4), "billed_calls": self.billed_calls}
 
 
 def _dotenv_key():
@@ -52,7 +63,7 @@ def _dotenv_key():
 
 
 class RippleClient:
-    def __init__(self, model=MODEL, usage=None):
+    def __init__(self, model=MODEL, usage=None, max_attempts=8):
         from openai import OpenAI
         key = os.environ.get("OPENROUTER_API_KEY") or _dotenv_key()
         if not key:
@@ -60,26 +71,27 @@ class RippleClient:
         self.c = OpenAI(api_key=key, base_url="https://openrouter.ai/api/v1", timeout=300, max_retries=0)
         self.model = model
         self.usage = usage or Usage()
+        self.max_attempts = max_attempts   # retries on 429 / 5xx / timeouts (back-off 2 s -> 90 s)
 
     def _create(self, **kw):
         delay = 2.0
-        for attempt in range(6):
+        for attempt in range(self.max_attempts):
             try:
                 r = self.c.chat.completions.create(model=self.model, **kw)
                 self.usage.add(getattr(r, "usage", None))
                 if not r.choices:
                     raise RuntimeError(f"empty choices: {r}")
                 return r
-            except Exception as e:  # rate limits / provider hiccups
-                if attempt == 5 or "Error code: 402" in str(e) or "Error code: 401" in str(e):
+            except Exception as e:  # rate limits (429) / provider hiccups (502, 503, timeouts)
+                if attempt == self.max_attempts - 1 or "Error code: 402" in str(e) or "Error code: 401" in str(e):
                     raise                     # out of credits / bad key: retrying won't help
                 time.sleep(delay + random.random())
-                delay = min(delay * 2, 60)
+                delay = min(delay * 2, 90)
 
     def chat(self, messages, tools=None, temperature=0.7, max_tokens=8192, seed=None):
         """Returns (assistant_message_dict, reasoning_text)."""
         kw = dict(messages=messages, temperature=temperature, max_tokens=max_tokens,
-                  extra_body={"reasoning": {"enabled": True}, "include_reasoning": True})
+                  extra_body={"reasoning": {"enabled": True}, "include_reasoning": True, "usage": {"include": True}})
         if tools:
             kw["tools"], kw["tool_choice"] = tools, "auto"
         if seed is not None:

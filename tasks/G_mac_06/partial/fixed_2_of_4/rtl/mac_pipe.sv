@@ -1,4 +1,12 @@
-// 3-stage pipelined multiply-accumulate. clear travels with its sample.
+// ----------------------------------------------------------------------------
+// SPEC: mac_pipe
+// 3-stage pipelined multiply-accumulate. A sample (a, b) presented with
+// in_valid=1 produces out_valid=1 exactly three cycles later, at which point
+// acc holds the running sum of the 8x8 products (24-bit accumulator).
+// clear=1 on a sample makes acc restart from that sample's product; clear
+// travels with its sample through the pipeline. acc holds its value between
+// valid samples. Reset (async, active-low) clears acc and the valid pipeline.
+// ----------------------------------------------------------------------------
 module mac_pipe (
   input  logic        clk,
   input  logic        rst_n,

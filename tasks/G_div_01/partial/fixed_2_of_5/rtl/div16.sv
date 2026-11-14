@@ -1,4 +1,11 @@
-// Unsigned 16/8 divider, radix-2 restoring, 17 cycles. Divide-by-zero falls out naturally: q = FFFF, r = a[7:0].
+// ----------------------------------------------------------------------------
+// SPEC: div16
+// Unsigned 16/8 divider (radix-2 restoring) with a start/done handshake.
+// start while not busy begins a division of a by b; operands are only valid
+// in the start cycle. busy is high while working. When the result is ready,
+// done pulses for one cycle and q (quotient) / r (remainder) are valid.
+// Latency up to 20 cycles is allowed. Divide-by-zero: q = FFFF, r = a[7:0].
+// ----------------------------------------------------------------------------
 module div16 (
   input  logic        clk,
   input  logic        rst_n,

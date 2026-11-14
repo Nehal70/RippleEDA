@@ -6,22 +6,16 @@ top: async_fifo
 rtl: [rtl/async_fifo.sv]
 lib: sky130hd
 prompt: |
-  rtl/async_fifo.sv is a depth-8 dual-clock FIFO with gray-coded pointers
-  crossing domains through synchronisers. It must work for any ratio between
-  the write and read clocks. Make it signoff-ready
-  (3 ns write clock).
-  Keep the port list.
-  tb/tb_smoke_afifo.sv is the block's smoke test.
-public_checks:   # run by the honest PRM (files from the original start/, agent edits ignored)
-  - {type: sim, tb: [tb/tb_smoke_afifo.sv], top: tb_smoke}
+  rtl/async_fifo.sv isn't passing. Fix it. Keep the port list. It must close timing at 3 ns on wclk.
 checks:
   - {type: lint, weight: 1}
   - {type: sim, tb: ["tb/tb_afifo.sv"], top: tb, weight: 4, variants: [{"params": {"WPER": 10, "RPER": 14}}, {"params": {"WPER": 14, "RPER": 7}}]}
-  - {type: synth, no_latches: true, weight: 1}
+  - {type: synth, no_latches: true, max_cells: 186, weight: 1}
   - {type: sta, period_ns: 3.0, clock: wclk, weight: 1}
 generated_from: afifo
 bugs: ["a1_gray_encode_wrong", "a3_empty_reset_low", "a5_rdata_next_entry", "a7_read_when_empty"]
+reference_cells: 169
 why_mcts: |
-  4 independent bugs drawn from a verified catalog; each is caught on its own by the public
-  smoke test, so every verified fix raises the public reward. A single trajectory must find and fix
-  all 4 without regressing; search keeps each fix as a node.
+  4 independent bugs drawn from a verified catalog. The prompt carries no spec and no testbench:
+  the behavioural contract is only in the SPEC header of the RTL, so the agent must read it, write its
+  own tests, and find and fix all 4 bugs without regressing; search keeps each verified fix as a node.
